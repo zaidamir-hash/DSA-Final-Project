@@ -1,11 +1,3 @@
-/*
- * DSA Project - Mini Food-Delivery Simulator
- * Team: Ali Zeeshan (24K-0749), Hasan Khan (24K-0525), Zaid Amir (24K-0813)
- * Course: Data Structures
- * Instructor: Ms. Fizza Aqeel
- * Date: 9/10/25
- */
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -19,7 +11,6 @@ using namespace std;
 
 const int INF = 999999;
 
-// ==================== LINKED LIST ====================
 template <typename T>
 class Node
 {
@@ -98,7 +89,6 @@ public:
     }
 };
 
-// ==================== QUEUE (FIFO) ====================
 template <typename T>
 class Queue
 {
@@ -155,7 +145,6 @@ public:
     }
 };
 
-// ==================== STACK (LIFO) ====================
 template <typename T>
 class Stack
 {
@@ -200,7 +189,6 @@ public:
     }
 };
 
-// ==================== PRIORITY QUEUE ====================
 template <typename T>
 class PriorityQueue
 {
@@ -268,7 +256,6 @@ public:
     }
 };
 
-// ==================== BINARY SEARCH TREE ====================
 struct Restaurant
 {
     int id;
@@ -383,7 +370,6 @@ public:
     }
 };
 
-// ==================== GRAPH ====================
 struct Edge
 {
     int dest;
@@ -393,7 +379,6 @@ struct Edge
     Edge(int d, int w, string name = "") : dest(d), weight(w), streetName(name) {}
 };
 
-// Node information for display
 struct NodeInfo
 {
     int id;
@@ -418,7 +403,6 @@ public:
         nodeInfo.resize(v);
     }
 
-    // Allow FoodDeliverySimulator to access adjList for display
     friend class FoodDeliverySimulator;
 
     void setNodeInfo(int id, string name, string type)
@@ -441,10 +425,9 @@ public:
     void addEdge(int src, int dest, int weight, string streetName = "")
     {
         adjList[src].insert(Edge(dest, weight, streetName));
-        adjList[dest].insert(Edge(src, weight, streetName)); // Undirected graph
+        adjList[dest].insert(Edge(src, weight, streetName));
     }
 
-    // Dijkstra's Algorithm with path tracking
     pair<vector<int>, vector<int>> dijkstraWithPath(int source, int destination)
     {
         vector<int> dist(vertices, INF);
@@ -458,7 +441,6 @@ public:
             int u = -1;
             int minDist = INF;
 
-            // Find minimum distance vertex
             for (int i = 0; i < vertices; i++)
             {
                 if (!visited[i] && dist[i] < minDist)
@@ -473,7 +455,6 @@ public:
 
             visited[u] = true;
 
-            // Update distances of adjacent vertices
             Node<Edge> *temp = adjList[u].getHead();
             while (temp)
             {
@@ -492,7 +473,6 @@ public:
         return make_pair(dist, parent);
     }
 
-    // Get street name between two nodes
     string getStreetName(int from, int to)
     {
         Node<Edge> *temp = adjList[from].getHead();
@@ -507,24 +487,20 @@ public:
         return "Unknown Street";
     }
 
-    // Display path from source to destination
     void displayPath(int source, int destination, vector<int> &parent, int totalDistance)
     {
         vector<int> path;
         int current = destination;
 
-        // Reconstruct path
         while (current != -1)
         {
             path.push_back(current);
             current = parent[current];
         }
 
-        // Reverse to get path from source to destination
         reverse(path.begin(), path.end());
 
-        // Calculate ETA (assuming average speed of 30 km/h in Karachi traffic)
-        int eta = (totalDistance * 60) / 30; // Convert to minutes
+        int eta = (totalDistance * 60) / 30;
 
         cout << "\n========== Route Details ==========" << endl;
         cout << "From: " << getNodeName(source) << " (Restaurant)" << endl;
@@ -541,7 +517,6 @@ public:
                 string street = getStreetName(path[i], path[i + 1]);
                 int segmentDist = 0;
 
-                // Find distance for this segment
                 Node<Edge> *temp = adjList[path[i]].getHead();
                 while (temp)
                 {
@@ -560,7 +535,6 @@ public:
         cout << "===================================" << endl;
     }
 
-    // Dijkstra's Algorithm (original version for compatibility)
     vector<int> dijkstra(int source)
     {
         vector<int> dist(vertices, INF);
@@ -573,7 +547,6 @@ public:
             int u = -1;
             int minDist = INF;
 
-            // Find minimum distance vertex
             for (int i = 0; i < vertices; i++)
             {
                 if (!visited[i] && dist[i] < minDist)
@@ -588,7 +561,6 @@ public:
 
             visited[u] = true;
 
-            // Update distances of adjacent vertices
             Node<Edge> *temp = adjList[u].getHead();
             while (temp)
             {
@@ -614,7 +586,6 @@ public:
     }
 };
 
-// ==================== ENTITY CLASSES ====================
 struct User
 {
     int id;
@@ -680,7 +651,6 @@ struct Assignment
     Assignment(int oid, int aid) : orderId(oid), agentId(aid) {}
 };
 
-// ==================== SIMULATOR CLASS ====================
 class FoodDeliverySimulator
 {
 private:
@@ -700,24 +670,22 @@ private:
 public:
     FoodDeliverySimulator() : graph(nullptr), nextOrderId(1), nextUserId(1), numNodes(0)
     {
-        // Auto-load all data files
         loadGraph("nodes.csv", "edges.csv");
         loadRestaurants("restaurants.csv");
-        clearUsersFile(); // Clear users.csv file
+        clearUsersFile();
         loadAgents("agents.csv");
-        loadOrderHistory("orders.csv"); // Load order history
+        loadOrderHistory("orders.csv");
     }
 
     ~FoodDeliverySimulator()
     {
-        saveOrderHistory("orders.csv"); // Save order history on exit
+        saveOrderHistory("orders.csv");
         if (graph)
         {
             delete graph;
         }
     }
 
-    // Load graph from CSV
     void loadGraph(string nodesFile, string edgesFile)
     {
         ifstream nodeIn(nodesFile);
@@ -728,7 +696,7 @@ public:
         }
 
         string line;
-        getline(nodeIn, line); // Skip header
+        getline(nodeIn, line);
 
         numNodes = 0;
         vector<string> nodeNames;
@@ -751,13 +719,11 @@ public:
 
         graph = new Graph(numNodes);
 
-        // Set node information
         for (int i = 0; i < numNodes; i++)
         {
             graph->setNodeInfo(i, nodeNames[i], nodeTypes[i]);
         }
 
-        // Load edges with street names
         ifstream edgeIn(edgesFile);
         if (!edgeIn)
         {
@@ -765,7 +731,7 @@ public:
             return;
         }
 
-        getline(edgeIn, line); // Skip header
+        getline(edgeIn, line);
 
         while (getline(edgeIn, line))
         {
@@ -784,7 +750,6 @@ public:
         cout << "Graph loaded successfully with " << numNodes << " nodes." << endl;
     }
 
-    // Load restaurants from CSV
     void loadRestaurants(string filename)
     {
         ifstream file(filename);
@@ -795,7 +760,7 @@ public:
         }
 
         string line;
-        getline(file, line); // Skip header
+        getline(file, line);
 
         while (getline(file, line))
         {
@@ -814,13 +779,12 @@ public:
         cout << "Restaurants loaded successfully." << endl;
     }
 
-    // Clear users CSV file
     void clearUsersFile()
     {
         ofstream file("users.csv", ios::trunc);
         if (file)
         {
-            file << "id,name,nodeId\n"; // Write header only
+            file << "id,name,nodeId\n";
             file.close();
             cout << "Users file cleared successfully." << endl;
         }
@@ -830,7 +794,6 @@ public:
         }
     }
 
-    // Load users from CSV
     void loadUsers(string filename)
     {
         ifstream file(filename);
@@ -841,7 +804,7 @@ public:
         }
 
         string line;
-        getline(file, line); // Skip header
+        getline(file, line);
 
         while (getline(file, line))
         {
@@ -859,14 +822,12 @@ public:
         cout << "Users loaded successfully." << endl;
     }
 
-    // Add a new user to the system and save to CSV
     int addUser(string name, int nodeId)
     {
         int userId = nextUserId++;
         User newUser(userId, name, nodeId);
         users.insert(newUser);
 
-        // Save to CSV file
         ofstream file("users.csv", ios::app);
         if (file)
         {
@@ -881,7 +842,6 @@ public:
         return userId;
     }
 
-    // Load agents from CSV
     void loadAgents(string filename)
     {
         ifstream file(filename);
@@ -892,7 +852,7 @@ public:
         }
 
         string line;
-        getline(file, line); // Skip header
+        getline(file, line);
 
         while (getline(file, line))
         {
@@ -910,18 +870,16 @@ public:
         cout << "Agents loaded successfully." << endl;
     }
 
-    // Load order history from CSV
     void loadOrderHistory(string filename)
     {
         ifstream file(filename);
         if (!file)
         {
-            // If file doesn't exist, it's okay - we'll create it when saving
             return;
         }
 
         string line;
-        getline(file, line); // Skip header
+        getline(file, line);
 
         while (getline(file, line))
         {
@@ -948,7 +906,6 @@ public:
 
             orderHistory.insert(order);
 
-            // Update nextOrderId to avoid conflicts
             if (order.orderId >= nextOrderId)
             {
                 nextOrderId = order.orderId + 1;
@@ -957,7 +914,6 @@ public:
         file.close();
     }
 
-    // Save order history to CSV
     void saveOrderHistory(string filename)
     {
         ofstream file(filename);
@@ -983,7 +939,6 @@ public:
         file.close();
     }
 
-    // Display all restaurants
     void displayRestaurants()
     {
         cout << "\n========== All Restaurants ==========" << endl;
@@ -991,7 +946,6 @@ public:
         cout << "=====================================" << endl;
     }
 
-    // Display all users
     void displayUsers()
     {
         cout << "\n========== All Users ==========" << endl;
@@ -999,7 +953,6 @@ public:
         cout << "===============================" << endl;
     }
 
-    // Display all agents
     void displayAgents()
     {
         cout << "\n========== All Agents ==========" << endl;
@@ -1007,7 +960,6 @@ public:
         cout << "================================" << endl;
     }
 
-    // Create a new order
     void createOrder()
     {
         string userName;
@@ -1015,7 +967,6 @@ public:
 
         cout << "\n========== Create New Order ==========" << endl;
 
-        // Display delivery points (nodes with type "delivery")
         cout << "\nAvailable Delivery Points in Karachi:" << endl;
         cout << "  1. Clifton Block 2" << endl;
         cout << "  3. Gulshan-e-Iqbal" << endl;
@@ -1030,27 +981,23 @@ public:
         cout << "Select delivery point (1, 3, 5, 7, or 8): ";
         cin >> nodeId;
 
-        // Validate node ID - must be delivery point
         if (nodeId != 1 && nodeId != 3 && nodeId != 5 && nodeId != 7 && nodeId != 8)
         {
             cout << "\nError: Invalid delivery point! Please select from the available options." << endl;
             return;
         }
 
-        // Add user to system
         int userId = addUser(userName, nodeId);
         cout << "\nUser created successfully!" << endl;
         cout << "User ID: " << userId << endl;
         cout << "Delivery Location: " << graph->getNodeName(nodeId) << endl;
 
-        // Display restaurants
         cout << "\nAvailable Restaurants in Karachi:" << endl;
         displayRestaurants();
 
         cout << "\nEnter Restaurant ID (1-5): ";
         cin >> restaurantId;
 
-        // Validate restaurant ID
         if (restaurantId < 1 || restaurantId > 5)
         {
             cout << "\nError: Invalid restaurant ID! Must be between 1 and 5." << endl;
@@ -1076,7 +1023,6 @@ public:
         cout << order << endl;
     }
 
-    // Find nearest available agent
     Agent *findNearestAgent(int restaurantNode)
     {
         if (!graph)
@@ -1104,7 +1050,6 @@ public:
         return nearestAgent;
     }
 
-    // Dispatch orders
     void dispatchOrders()
     {
         if (!graph)
@@ -1115,7 +1060,6 @@ public:
 
         int dispatched = 0;
 
-        // Process urgent orders first
         while (!urgentOrders.isEmpty())
         {
             Order order = urgentOrders.dequeue();
@@ -1127,7 +1071,6 @@ public:
                 continue;
             }
 
-            // Restaurant node is restaurantId - 1 (since restaurants are at nodes 0-4)
             int restaurantNode = order.restaurantId - 1;
 
             Agent *agent = findNearestAgent(restaurantNode);
@@ -1138,12 +1081,11 @@ public:
                 order.status = "Assigned";
                 agent->available = false;
 
-                // Calculate path and display route
                 auto result = graph->dijkstraWithPath(restaurantNode, user->nodeId);
                 vector<int> distances = result.first;
                 vector<int> parent = result.second;
                 int distance = distances[user->nodeId];
-                int eta = (distance * 60) / 30; // ETA in minutes (30 km/h avg speed)
+                int eta = (distance * 60) / 30;
 
                 cout << "\n============================================" << endl;
                 cout << "     ORDER DISPATCHED SUCCESSFULLY!        " << endl;
@@ -1156,7 +1098,6 @@ public:
                 cout << "Distance: " << distance << " km" << endl;
                 cout << "ETA: " << eta << " minutes" << endl;
 
-                // Display the full path with street names
                 graph->displayPath(restaurantNode, user->nodeId, parent, distance);
 
                 orderHistory.insert(order);
@@ -1165,14 +1106,12 @@ public:
             }
             else
             {
-                // No agent available, move to backlog
                 cout << "\nNo agent available for urgent order " << order.orderId
                      << ". Moving to backlog." << endl;
                 backlogOrders.enqueue(order);
             }
         }
 
-        // Process backlog orders
         int backlogProcessed = 0;
         Queue<Order> tempQueue;
 
@@ -1196,12 +1135,11 @@ public:
                 order.status = "Assigned";
                 agent->available = false;
 
-                // Calculate path and display route
                 auto result = graph->dijkstraWithPath(restaurantNode, user->nodeId);
                 vector<int> distances = result.first;
                 vector<int> parent = result.second;
                 int distance = distances[user->nodeId];
-                int eta = (distance * 60) / 30; // ETA in minutes (30 km/h avg speed)
+                int eta = (distance * 60) / 30;
 
                 cout << "\n============================================" << endl;
                 cout << "     ORDER DISPATCHED SUCCESSFULLY!        " << endl;
@@ -1214,7 +1152,6 @@ public:
                 cout << "Distance: " << distance << " km" << endl;
                 cout << "ETA: " << eta << " minutes" << endl;
 
-                // Display the full path with street names
                 graph->displayPath(restaurantNode, user->nodeId, parent, distance);
 
                 orderHistory.insert(order);
@@ -1228,7 +1165,6 @@ public:
             }
         }
 
-        // Re-enqueue remaining backlog orders
         while (!backlogOrders.isEmpty())
         {
             tempQueue.enqueue(backlogOrders.dequeue());
@@ -1241,7 +1177,7 @@ public:
         if (dispatched > 0)
         {
             cout << "\n>> " << dispatched << " order(s) dispatched successfully!" << endl;
-            saveOrderHistory("orders.csv"); // Save order history after dispatching
+            saveOrderHistory("orders.csv");
         }
         else
         {
@@ -1249,7 +1185,6 @@ public:
         }
     }
 
-    // Undo last assignment
     void undoLastAssignment()
     {
         if (assignmentHistory.isEmpty())
@@ -1260,7 +1195,6 @@ public:
 
         Assignment lastAssignment = assignmentHistory.pop();
 
-        // Free up the agent
         Agent *agent = agents.find(lastAssignment.agentId);
         if (agent)
         {
@@ -1274,7 +1208,6 @@ public:
         }
     }
 
-    // Display order history
     void displayOrderHistory()
     {
         cout << "\n========== Order History ==========" << endl;
@@ -1289,7 +1222,6 @@ public:
         cout << "===================================" << endl;
     }
 
-    // Display pending orders
     void displayPendingOrders()
     {
         cout << "\n========== Pending Orders ==========" << endl;
@@ -1298,7 +1230,6 @@ public:
         cout << "====================================" << endl;
     }
 
-    // Display network map
     void displayNetworkMap()
     {
         if (!graph)
@@ -1334,18 +1265,18 @@ public:
         cout << "                     |  \\                    \\" << endl;
         cout << "         (8km)       |   \\                    \\ (10km)" << endl;
         cout << "    Shahrah-e-Faisal |    \\ MA Jinnah Rd       \\ Clifton Bridge" << endl;
-        cout << "                     |     \\ (6km)             \\" << endl;
-        cout << "                     |      \\                   \\" << endl;
-        cout << "                     v       v                   v" << endl;
+        cout << "                     |     \\ (6km)              \\" << endl;
+        cout << "                     |      \\                    \\" << endl;
+        cout << "                     v       v                     v" << endl;
         cout << "          [1][D] Clifton  [4][R] Saddar  [2][R] Boat Basin" << endl;
         cout << "              |   \\          |              |" << endl;
         cout << "              |    \\         |              |" << endl;
         cout << "    (8km)     |     \\        | (9km)        | (7km)" << endl;
         cout << "  Korangi Rd  |      \\       | Sharae       | University Rd" << endl;
         cout << "              |       \\      | Quaideen     |" << endl;
-        cout << "              |    (5km)     |              |" << endl;
-        cout << "              |  Khayaban    |              |" << endl;
-        cout << "              |  Shamsheer   |              |" << endl;
+        cout << "              |    (5km)      |              |" << endl;
+        cout << "              |  Khayaban     |              |" << endl;
+        cout << "              |  Shamsheer    |              |" << endl;
         cout << "              v       \\      v              v" << endl;
         cout << "        [5][D] DHA      >--[2][R]    [3][D] Gulshan-e-Iqbal" << endl;
         cout << "           |   \\                           |    \\" << endl;
@@ -1377,7 +1308,6 @@ public:
         cout << "\n--- STREET CONNECTIONS TABLE ---" << endl;
         cout << "------------------------------------------------" << endl;
 
-        // Display all edges in a clean table
         bool displayed[10][10] = {false};
         for (int i = 0; i < numNodes; i++)
         {
@@ -1388,7 +1318,6 @@ public:
                 if (!displayed[i][j] && !displayed[j][i])
                 {
                     cout << "[" << i << "] " << graph->getNodeName(i);
-                    // Padding for alignment
                     int padding = 25 - graph->getNodeName(i).length();
                     for (int p = 0; p < padding; p++)
                         cout << " ";
@@ -1404,7 +1333,6 @@ public:
     }
 };
 
-// ==================== UTILITY FUNCTIONS ====================
 void clearScreen()
 {
 #ifdef _WIN32
@@ -1421,7 +1349,6 @@ void waitForBack()
     cin.get();
 }
 
-// ==================== MAIN MENU ====================
 void displayMenu()
 {
     clearScreen();
@@ -1449,13 +1376,7 @@ int main()
     int choice;
 
     clearScreen();
-    cout << "\n*** DSA Project - Mini Food-Delivery Simulator ***" << endl;
-    cout << "Team: Ali Zeeshan, Hasan Khan, Zaid Amir\n"
-         << endl;
-    cout << "Loading data files..." << endl;
-    cout << "\nData loaded successfully!" << endl;
-    cout << "\nPress Enter to continue...";
-    cin.get();
+    cout << "Mini Food-Delivery Simulator ***" << endl;
 
     while (true)
     {
@@ -1471,7 +1392,7 @@ int main()
             continue;
         }
 
-        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear remaining newline
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         clearScreen();
 
         switch (choice)
